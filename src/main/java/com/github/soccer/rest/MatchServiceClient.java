@@ -1,6 +1,7 @@
 package com.github.soccer.rest;
 
 import com.github.soccer.dto.Match;
+import com.github.utils.Constants;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -51,7 +52,7 @@ public class MatchServiceClient {
                     int homeTeamScore = fullTimeScore.getInt("homeTeam");
                     int awayTeamScore = fullTimeScore.getInt("awayTeam");
                     String score = homeTeamScore + "-" + awayTeamScore;
-                    String winner = "NONE";
+                    String winner = Constants.NO_WINNER_KEYWORD;
                     if (homeTeamScore > awayTeamScore) {
                         winner = homeTeam;
                     } else if (awayTeamScore > homeTeamScore) {

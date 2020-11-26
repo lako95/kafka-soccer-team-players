@@ -15,7 +15,10 @@ public class DbManager {
     private static Logger logger = LoggerFactory.getLogger(DbManager.class.getName());
 
     public static String GET_ALL_MATCHES = "SELECT * FROM MATCH";
+    public static String GET_ALL_NO_WINNING_MATCHES = "SELECT * FROM no_winner_match";
     public static String INSERT_MATCH = "insert into match(id,match_day ,home_team ,away_team ,winner ,score ) values (?,?,?,?,?,?)";
+    public static String INSERT_NO_WINNING_MATCH = "insert into no_winner_match(id,match_day ,home_team ,away_team ,winner ,score ) values (?,?,?,?,?,?)";
+
 
     public static Connection getConnection(){
         if(connection == null){
@@ -30,12 +33,21 @@ public class DbManager {
         return  connection;
     }
 
-    public static List<Match> getMatches() throws SQLException {
+    public static List<Match> getAllMatches() throws SQLException {
+        return getMatches(GET_ALL_MATCHES);
+    }
+
+    public static List<Match> getNoWinnerMatches() throws SQLException {
+        return getMatches(GET_ALL_NO_WINNING_MATCHES);
+    }
+
+
+    private static List<Match> getMatches(String query) throws SQLException {
         Connection connection = getConnection();
         Statement statement = connection.createStatement();
 
         List<Match> matches = new ArrayList<Match>();
-        ResultSet resultSet = statement.executeQuery(GET_ALL_MATCHES);
+        ResultSet resultSet = statement.executeQuery(query);
         while(resultSet.next()){
             Match match = new Match();
             match.setId(resultSet.getInt(1));
@@ -47,16 +59,27 @@ public class DbManager {
             matches.add(match);
         }
 
-        return matches;
+        return  matches;
     }
 
     public static void insertMatches(List<Match> matches) throws SQLException {
-        List<Match> currentMatches = getMatches();
+        List<Match> currentMatches = getAllMatches();
         List<Match> matchToInsert = matches.stream().filter(m -> !currentMatches.contains(m)).collect(Collectors.toList());
 
+        insertMatch(matchToInsert, INSERT_MATCH);
+    }
+
+    public static void insertNoWinnerMatches(List<Match> matches) throws SQLException {
+        List<Match> currentNoWinnerMatches = getNoWinnerMatches();
+        List<Match> matchToInsert = matches.stream().filter(m -> !currentNoWinnerMatches.contains(m)).collect(Collectors.toList());
+
+        insertMatch(matchToInsert, INSERT_NO_WINNING_MATCH);
+    }
+
+    private static void insertMatch(List<Match> matches, String query) throws SQLException {
         Connection connection = getConnection();
-        for(Match match : matchToInsert){
-            PreparedStatement statement = connection.prepareStatement(INSERT_MATCH);
+        for(Match match : matches){
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setInt(1,match.getId());
             statement.setInt(2,match.getMatchDay());
             statement.setString(3,match.getHomeTeam());

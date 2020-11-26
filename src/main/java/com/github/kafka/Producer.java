@@ -1,5 +1,6 @@
 package com.github.kafka;
 
+import com.github.kafka.serializer.MatchSerializer;
 import com.github.soccer.dto.Match;
 import com.github.soccer.rest.MatchServiceClient;
 import com.github.utils.Constants;
@@ -21,14 +22,15 @@ public class Producer {
 
         //create Producer properties
         Properties properties = new Properties();
-        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "com.github.kafka.serializer.MatchSerializer");
-        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "com.github.kafka.serializer.MatchSerializer");
+        properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKA_SERVER);
+        properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, MatchSerializer.class.getName());
+        properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, MatchSerializer.class.getName());
 
         //create the producer
         KafkaProducer<String,Match> producer = new KafkaProducer<String, Match>(properties);
 
         List<Match> matches = MatchServiceClient.getMatchesFromApi();
+        logger.info("N matches fetched = " + matches.size());
         if(matches != null) {
             //send data
             for (Match match : matches) {

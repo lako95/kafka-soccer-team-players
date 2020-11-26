@@ -1,6 +1,7 @@
 package com.github.kafka;
 
 import com.github.db.DbManager;
+import com.github.kafka.deserializer.MatchDeserializer;
 import com.github.soccer.dto.Match;
 import com.github.utils.Constants;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -26,9 +27,9 @@ public class Consumer {
 
         //create customer configs
         Properties properties = new Properties();
-        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, "com.github.kafka.deserializer.MatchDeserializer");
-        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, "com.github.kafka.deserializer.MatchDeserializer");
+        properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKA_SERVER);
+        properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, MatchDeserializer.class.getName());
+        properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, MatchDeserializer.class.getName());
         properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, groupId);
         properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
